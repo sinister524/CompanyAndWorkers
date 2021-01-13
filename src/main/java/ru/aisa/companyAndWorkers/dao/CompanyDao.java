@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import ru.aisa.companyAndWorkers.entity.Company;
+import ru.aisa.companyAndWorkers.entity.Worker;
 import ru.aisa.companyAndWorkers.repository.CompanyRepository;
 import ru.aisa.companyAndWorkers.row_mapper.CompanyRowMapper;
 import ru.aisa.companyAndWorkers.row_mapper.WorkerRowMapper;
@@ -32,40 +33,41 @@ public class CompanyDao implements CompanyRepository {
     public List<Company> findAll() {
         List<Company> companies = namedParameterJdbcTemplate.query("SELECT * FROM public.company", companyRowMapper);
         return companies.stream()
-                .peek(company -> {
+                .map(company -> {
                     SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("company_id", company.getId());
-                    company.setWorkers(namedParameterJdbcTemplate.query("SELECT * FROM public.worker " +
-                            "WHERE company_id = :account_id", namedParameters, workerRowMapper));
+                    List<Worker> companyWorkers = namedParameterJdbcTemplate.query("SELECT * FROM public.worker " +
+                            "WHERE company_id = :company_id", namedParameters, workerRowMapper);
+                    return linkCompanyAndWorkers(company, companyWorkers);
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
     public Company findById(Long id) {
-        SqlParameterSource searchIdParameters = new MapSqlParameterSource().addValue("id", id);
+        SqlParameterSource requiredId = new MapSqlParameterSource().addValue("id", id);
         Optional<Company> optionalCompany = Optional.ofNullable(
                 namedParameterJdbcTemplate.queryForObject("SELECT * FROM public.company WHERE id = :id",
-                        searchIdParameters, Company.class));
+                        requiredId, companyRowMapper));
         Company company = optionalCompany.orElseThrow(NoSuchElementException::new);
         SqlParameterSource companyIdParameter = new MapSqlParameterSource().addValue("company_id", company.getId());
-        company.setWorkers(namedParameterJdbcTemplate.query("SELECT * FROM public.worker " +
-                "WHERE company_id = :account_id", companyIdParameter, workerRowMapper));
-        return company;
+        List<Worker> companyWorkers = namedParameterJdbcTemplate.query("SELECT * FROM public.worker " +
+                "WHERE company_id = :company_id", companyIdParameter, workerRowMapper);
+        return linkCompanyAndWorkers(company, companyWorkers);
     }
 
     @Override
     public Company findByInn(String inn) {
-        SqlParameterSource companyInnParameter = new MapSqlParameterSource().addValue("inn", inn);
+        SqlParameterSource requiredInnParameter = new MapSqlParameterSource().addValue("inn", inn);
         Long companyId = namedParameterJdbcTemplate.queryForObject("SELECT id FROM public.company WHERE inn = :inn",
-                companyInnParameter, Long.class);
+                requiredInnParameter, Long.class);
         return findById(companyId);
     }
 
     @Override
     public void delete(Long id) {
-        SqlParameterSource companyIdParameter = new MapSqlParameterSource().addValue("id", id);
+        SqlParameterSource requiredIdParameter = new MapSqlParameterSource().addValue("id", id);
         int deleteStatus = namedParameterJdbcTemplate.update("DELETE FROM public.company WHERE id = :id",
-                companyIdParameter);
+                requiredIdParameter);
         if (deleteStatus == 0) {
             throw new NoSuchElementException();
         }
@@ -73,9 +75,9 @@ public class CompanyDao implements CompanyRepository {
 
     @Override
     public void delete(String inn) {
-        SqlParameterSource companyIdParameter = new MapSqlParameterSource().addValue("inn", inn);
+        SqlParameterSource requiredInnParameter = new MapSqlParameterSource().addValue("inn", inn);
         int deleteStatus = namedParameterJdbcTemplate.update("DELETE FROM public.company WHERE inn = :inn",
-                companyIdParameter);
+                requiredInnParameter);
         if (deleteStatus == 0) {
             throw new NoSuchElementException();
         }
@@ -101,8 +103,23 @@ public class CompanyDao implements CompanyRepository {
                 .addValue("inn", company.getInn())
                 .addValue("phone_number", company.getPhoneNumber())
                 .addValue("address", company.getAddress());
-        namedParameterJdbcTemplate.update("UPDATE public.company SET (name, inn, phone_number, address) " +
-                "VALUES (:name, :inn, :phone_number, :address) WHERE id = :id", companyParametersForUpdate);
+        namedParameterJdbcTemplate.update("UPDATE public.company " +
+                "SET name = :name, inn = :inn, phone_number = :phone_number, address = :address WHERE id = :id",
+                companyParametersForUpdate);
         return findById(company.getId());
+    }
+
+    private Company linkCompanyAndWorkers(Company company, List<Worker> workers){
+        workers = workers.stream()
+                .peek(worker -> worker.setCompany(company))
+                .collect(Collectors.toList());
+        company.setWorkers(workers);
+        return company;
+    }
+
+    @Override
+    public void clear() {
+        SqlParameterSource emptyParameter = new MapSqlParameterSource();
+        namedParameterJdbcTemplate.update("DELETE FROM public.company", emptyParameter);
     }
 }

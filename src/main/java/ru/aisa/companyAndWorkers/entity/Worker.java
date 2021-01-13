@@ -33,6 +33,25 @@ public class Worker implements Comparable<Worker>{
         this.company = company;
     }
 
+    public Worker(String name, String birthday, String email, Company company) {
+        this.name = name;
+        this.birthday = birthday;
+        this.email = email;
+        this.company = company;
+    }
+
+    @Override
+    public String toString() {
+        return "Worker{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", birthday='" + birthday + '\'' +
+                ", email='" + email + '\'' +
+                ", photo=" + photo +
+                ", company=" + company.getName() +
+                '}';
+    }
+
     @Override
     public int compareTo(Worker worker) {
         return id.compareTo(worker.getId());

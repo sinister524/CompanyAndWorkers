@@ -17,6 +17,8 @@ public interface CompanyRepository {
 
     void delete (String inn);
 
+    void clear ();
+
     Company save (Company company);
 
     Company update (Company company);

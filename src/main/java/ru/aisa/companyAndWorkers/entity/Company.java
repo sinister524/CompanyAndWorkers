@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @AllArgsConstructor
@@ -31,5 +32,18 @@ public class Company {
         this.inn = inn;
         this.phoneNumber = phoneNumber;
         this.address = address;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Company company = (Company) o;
+        return id.equals(company.id) && name.equals(company.name) && inn.equals(company.inn) && phoneNumber.equals(company.phoneNumber) && address.equals(company.address);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, inn, phoneNumber, address);
     }
 }

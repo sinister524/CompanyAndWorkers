@@ -11,11 +11,13 @@ public interface WorkerRepository {
 
     Worker findById (Long id);
 
-    Worker findByInn (String inn);
+    Worker findByEmail(String email);
 
     void delete (Long id);
 
-    void delete (String inn);
+    void delete (String email);
+
+    void clear();
 
     Worker save (Worker worker);
 
