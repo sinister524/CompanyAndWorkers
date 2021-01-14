@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.File;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -12,12 +13,12 @@ import java.io.File;
 public class Worker implements Comparable<Worker>{
     private Long id;
     private String name;
-    private String birthday;
+    private Date birthday;
     private String email;
     private File photo;
     private Company company;
 
-    public Worker(Long id, String name, String birthday, String email, File photo) {
+    public Worker(Long id, String name, Date birthday, String email, File photo) {
         this.id = id;
         this.name = name;
         this.birthday = birthday;
@@ -25,7 +26,7 @@ public class Worker implements Comparable<Worker>{
         this.photo = photo;
     }
 
-    public Worker(String name, String birthday, String email, File photo, Company company) {
+    public Worker(String name, Date birthday, String email, File photo, Company company) {
         this.name = name;
         this.birthday = birthday;
         this.email = email;
@@ -33,7 +34,7 @@ public class Worker implements Comparable<Worker>{
         this.company = company;
     }
 
-    public Worker(String name, String birthday, String email, Company company) {
+    public Worker(String name, Date birthday, String email, Company company) {
         this.name = name;
         this.birthday = birthday;
         this.email = email;

@@ -4,8 +4,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.stereotype.Repository;
 import ru.aisa.companyAndWorkers.entity.Worker;
+import ru.aisa.companyAndWorkers.repository.CompanyRepository;
 import ru.aisa.companyAndWorkers.repository.WorkerRepository;
 import ru.aisa.companyAndWorkers.row_mapper.WorkerRowMapper;
 
@@ -14,24 +14,23 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
 public class WorkerDao implements WorkerRepository {
 
     private final WorkerRowMapper workerRowMapper;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final CompanyDao companyDao;
+    private final CompanyRepository companyRepository;
 
-    public WorkerDao(WorkerRowMapper workerRowMapper, JdbcTemplate jdbcTemplate, CompanyDao companyDao) {
+    public WorkerDao(WorkerRowMapper workerRowMapper, JdbcTemplate jdbcTemplate, CompanyRepository companyRepository) {
         this.workerRowMapper = workerRowMapper;
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-        this.companyDao = companyDao;
+        this.companyRepository = companyRepository;
     }
 
     @Override
     public List<Worker> findAll() {
         List<Worker> workers = namedParameterJdbcTemplate.query("SELECT * FROM public.worker", workerRowMapper);
         return workers.stream()
-                .peek(worker -> worker.setCompany(companyDao.findById(worker.getCompany().getId())))
+                .peek(worker -> worker.setCompany(companyRepository.findById(worker.getCompany().getId())))
                 .collect(Collectors.toList());
     }
 
@@ -42,7 +41,7 @@ public class WorkerDao implements WorkerRepository {
                 namedParameterJdbcTemplate.queryForObject("SELECT * FROM public.worker WHERE id = :id",
                 requiredId, workerRowMapper));
         Worker worker = optionalWorker.orElseThrow(NoSuchElementException::new);
-        worker.setCompany(companyDao.findById(worker.getCompany().getId()));
+        worker.setCompany(companyRepository.findById(worker.getCompany().getId()));
         return worker;
     }
 

@@ -2,6 +2,7 @@ package ru.aisa.companyAndWorkers.repository;
 
 import ru.aisa.companyAndWorkers.entity.Company;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 

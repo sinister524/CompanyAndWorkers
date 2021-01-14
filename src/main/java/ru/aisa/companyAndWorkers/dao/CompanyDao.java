@@ -4,7 +4,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.stereotype.Repository;
 import ru.aisa.companyAndWorkers.entity.Company;
 import ru.aisa.companyAndWorkers.entity.Worker;
 import ru.aisa.companyAndWorkers.repository.CompanyRepository;
@@ -16,7 +15,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
 public class CompanyDao implements CompanyRepository {
 
     private final CompanyRowMapper companyRowMapper;

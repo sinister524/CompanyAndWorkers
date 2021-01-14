@@ -10,6 +10,8 @@ import ru.aisa.companyAndWorkers.row_mapper.WorkerRowMapper;
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.sql.SQLException;
+import java.util.Date;
 
 public class DaoTest extends TestCase {
 
@@ -36,16 +38,16 @@ public class DaoTest extends TestCase {
         companyDao.clear();
     }
 
-    public void testFindAll() {
+    public void testFindAll() throws SQLException {
         Company company = new Company("IBM", "1111111", "844898745", "USA");
         company = companyDao.save(company);
         assertNotNull(company);
         System.out.println(company);
-        Worker worker = new Worker("Jonie", "1983", "some@mail.com", new File("photo.jpeg"), company);
+        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", new File("photo.jpeg"), company);
         worker = workerDao.save(worker);
         System.out.println(worker);
         assertNotNull(worker);
-        Worker worker2 = new Worker("Bob", "1993", "kotik@mail.com", new File("photo.jpeg"), company);
+        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", new File("photo.jpeg"), company);
         worker2 = workerDao.save(worker2);
         assertNotNull(worker2);
         System.out.println(worker2);
@@ -57,14 +59,14 @@ public class DaoTest extends TestCase {
         System.out.println(workerDao.findAll());
     }
 
-    public void testDelete() {
+    public void testDelete() throws SQLException {
         Company company = new Company("IBM", "1111111", "844898745", "USA");
         company = companyDao.save(company);
         assertNotNull(company);
-        Worker worker = new Worker("Jonie", "1983", "some@mail.com", new File("photo.jpeg"), company);
+        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", new File("photo.jpeg"), company);
         worker = workerDao.save(worker);
         assertNotNull(worker);
-        Worker worker2 = new Worker("Bob", "1993", "kotik@mail.com", new File("photo.jpeg"), company);
+        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", new File("photo.jpeg"), company);
         worker2 = workerDao.save(worker2);
         assertNotNull(worker2);
 
@@ -80,32 +82,32 @@ public class DaoTest extends TestCase {
         System.out.println(workerDao.findAll());
     }
 
-    public void testSave() {
+    public void testSave() throws SQLException {
         Company company = new Company("IBM", "1111111", "844898745", "USA");
         company = companyDao.save(company);
         assertNotNull(company);
         System.out.println(company);
-        Worker worker = new Worker("Jonie", "1983", "some@mail.com", new File("photo.jpeg"), company);
+        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", new File("photo.jpeg"), company);
         worker = workerDao.save(worker);
         System.out.println(worker);
         assertNotNull(worker);
-        Worker worker2 = new Worker("Bob", "1993", "kotik@mail.com", new File("photo.jpeg"), company);
+        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", new File("photo.jpeg"), company);
         worker2 = workerDao.save(worker2);
         assertNotNull(worker2);
         System.out.println(worker2);
         System.out.println(companyDao.findById(worker2.getCompany().getId()));
     }
 
-    public void testUpdate() {
+    public void testUpdate() throws SQLException {
         Company company = new Company("IBM", "1111111", "844898745", "USA");
         company = companyDao.save(company);
         assertNotNull(company);
         System.out.println(company);
-        Worker worker = new Worker("Jonie", "1983", "some@mail.com", new File("photo.jpeg"), company);
+        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", new File("photo.jpeg"), company);
         worker = workerDao.save(worker);
         System.out.println(worker);
         assertNotNull(worker);
-        Worker worker2 = new Worker("Bob", "1993", "kotik@mail.com", new File("photo.jpeg"), company);
+        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", new File("photo.jpeg"), company);
         worker2 = workerDao.save(worker2);
         assertNotNull(worker2);
         System.out.println(worker2);
