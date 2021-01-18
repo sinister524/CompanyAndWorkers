@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import ru.aisa.companyAndWorkers.entity.Company;
 import ru.aisa.companyAndWorkers.entity.Worker;
+import ru.aisa.companyAndWorkers.exception.ValueNotUniqueException;
 import ru.aisa.companyAndWorkers.repository.CompanyRepository;
 import ru.aisa.companyAndWorkers.row_mapper.CompanyRowMapper;
 import ru.aisa.companyAndWorkers.row_mapper.WorkerRowMapper;
@@ -88,8 +89,11 @@ public class CompanyDao implements CompanyRepository {
                 .addValue("inn", company.getInn())
                 .addValue("phone_number", company.getPhoneNumber())
                 .addValue("address", company.getAddress());
-        namedParameterJdbcTemplate.update("INSERT INTO public.company (name, inn, phone_number, address) " +
+        int saveStatus = namedParameterJdbcTemplate.update("INSERT INTO public.company (name, inn, phone_number, address) " +
                 "VALUES (:name, :inn, :phone_number, :address)", companyParametersForInsert);
+        if (saveStatus == 0) {
+            throw new ValueNotUniqueException("Компания с таким ИНН уже существует");
+        }
         return findByInn(company.getInn());
     }
 
@@ -101,9 +105,14 @@ public class CompanyDao implements CompanyRepository {
                 .addValue("inn", company.getInn())
                 .addValue("phone_number", company.getPhoneNumber())
                 .addValue("address", company.getAddress());
-        namedParameterJdbcTemplate.update("UPDATE public.company " +
+        Optional.ofNullable(namedParameterJdbcTemplate.queryForObject("SELECT * FROM public.company WHERE id = :id",
+                companyParametersForUpdate, companyRowMapper)).orElseThrow(NoSuchElementException::new);
+        int updateStatus = namedParameterJdbcTemplate.update("UPDATE public.company " +
                 "SET name = :name, inn = :inn, phone_number = :phone_number, address = :address WHERE id = :id",
                 companyParametersForUpdate);
+        if (updateStatus == 0) {
+            throw new ValueNotUniqueException("Компания с таким ИНН уже существует");
+        }
         return findById(company.getId());
     }
 

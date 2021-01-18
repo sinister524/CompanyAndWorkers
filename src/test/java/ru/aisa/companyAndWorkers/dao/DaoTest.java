@@ -43,11 +43,11 @@ public class DaoTest extends TestCase {
         company = companyDao.save(company);
         assertNotNull(company);
         System.out.println(company);
-        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", new File("photo.jpeg"), company);
+        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", company);
         worker = workerDao.save(worker);
         System.out.println(worker);
         assertNotNull(worker);
-        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", new File("photo.jpeg"), company);
+        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", company);
         worker2 = workerDao.save(worker2);
         assertNotNull(worker2);
         System.out.println(worker2);
@@ -63,10 +63,10 @@ public class DaoTest extends TestCase {
         Company company = new Company("IBM", "1111111", "844898745", "USA");
         company = companyDao.save(company);
         assertNotNull(company);
-        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", new File("photo.jpeg"), company);
+        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", company);
         worker = workerDao.save(worker);
         assertNotNull(worker);
-        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", new File("photo.jpeg"), company);
+        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", company);
         worker2 = workerDao.save(worker2);
         assertNotNull(worker2);
 
@@ -87,11 +87,11 @@ public class DaoTest extends TestCase {
         company = companyDao.save(company);
         assertNotNull(company);
         System.out.println(company);
-        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", new File("photo.jpeg"), company);
+        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", company);
         worker = workerDao.save(worker);
         System.out.println(worker);
         assertNotNull(worker);
-        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", new File("photo.jpeg"), company);
+        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", company);
         worker2 = workerDao.save(worker2);
         assertNotNull(worker2);
         System.out.println(worker2);
@@ -103,11 +103,11 @@ public class DaoTest extends TestCase {
         company = companyDao.save(company);
         assertNotNull(company);
         System.out.println(company);
-        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", new File("photo.jpeg"), company);
+        Worker worker = new Worker("Jonie", new Date(), "some@mail.com", company);
         worker = workerDao.save(worker);
         System.out.println(worker);
         assertNotNull(worker);
-        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", new File("photo.jpeg"), company);
+        Worker worker2 = new Worker("Bob", new Date(), "kotik@mail.com", company);
         worker2 = workerDao.save(worker2);
         assertNotNull(worker2);
         System.out.println(worker2);

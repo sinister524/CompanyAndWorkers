@@ -15,6 +15,6 @@ public class WorkerRowMapper implements RowMapper<Worker> {
         Company company = new Company();
         company.setId(resultSet.getLong("company_id"));
         return new Worker(resultSet.getLong("id"), resultSet.getString("name"), resultSet.getDate("birthday"),
-                resultSet.getString("email"), new File(resultSet.getString("photo")), company);
+                resultSet.getString("email"), company);
     }
 }

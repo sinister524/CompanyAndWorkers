@@ -4,7 +4,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import ru.aisa.companyAndWorkers.entity.Company;
 import ru.aisa.companyAndWorkers.entity.Worker;
+import ru.aisa.companyAndWorkers.exception.ValueNotUniqueException;
 import ru.aisa.companyAndWorkers.repository.CompanyRepository;
 import ru.aisa.companyAndWorkers.repository.WorkerRepository;
 import ru.aisa.companyAndWorkers.row_mapper.WorkerRowMapper;
@@ -29,6 +31,16 @@ public class WorkerDao implements WorkerRepository {
     @Override
     public List<Worker> findAll() {
         List<Worker> workers = namedParameterJdbcTemplate.query("SELECT * FROM public.worker", workerRowMapper);
+        return workers.stream()
+                .peek(worker -> worker.setCompany(companyRepository.findById(worker.getCompany().getId())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Worker> findAllCompanyWorkers(Company company) {
+        List<Worker> workers = namedParameterJdbcTemplate.query(
+                "SELECT * FROM public.worker WHERE company_id = " + company.getId(),
+                workerRowMapper);
         return workers.stream()
                 .peek(worker -> worker.setCompany(companyRepository.findById(worker.getCompany().getId())))
                 .collect(Collectors.toList());
@@ -85,10 +97,12 @@ public class WorkerDao implements WorkerRepository {
                 .addValue("name", worker.getName())
                 .addValue("birthday", worker.getBirthday())
                 .addValue("email", worker.getEmail())
-                .addValue("photo", worker.getPhoto().getPath())
                 .addValue("company_id", worker.getCompany().getId());
-        namedParameterJdbcTemplate.update("INSERT INTO public.worker (name, birthday, email, photo, company_id) " +
-                "VALUES (:name, :birthday, :email, :photo, :company_id)", parametersForInsert);
+        int saveStatus = namedParameterJdbcTemplate.update("INSERT INTO public.worker (name, birthday, email, company_id) " +
+                "VALUES (:name, :birthday, :email, :company_id)", parametersForInsert);
+        if (saveStatus == 0) {
+            throw new ValueNotUniqueException("Работник с таким Email уже существует");
+        }
         return findByEmail(worker.getEmail());
     }
 
@@ -99,11 +113,13 @@ public class WorkerDao implements WorkerRepository {
                 .addValue("name", worker.getName())
                 .addValue("birthday", worker.getBirthday())
                 .addValue("email", worker.getEmail())
-                .addValue("photo", worker.getPhoto().getPath() + worker.getPhoto().getName())
                 .addValue("company_id", worker.getCompany().getId());
-        namedParameterJdbcTemplate.update("UPDATE public.worker " +
-                "SET name = :name, birthday = :birthday, email =:email, photo = :photo, company_id = :company_id " +
+        int updateStatus = namedParameterJdbcTemplate.update("UPDATE public.worker " +
+                "SET name = :name, birthday = :birthday, email =:email, company_id = :company_id " +
                 "WHERE id = :id", parametersForUpdate);
+        if (updateStatus == 0) {
+            throw new ValueNotUniqueException("Работник с таким Email уже существует");
+        }
         return findById(worker.getId());
     }
 }

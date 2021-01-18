@@ -7,11 +7,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import ru.aisa.companyAndWorkers.comfig.SpringJdbcConfig;
 import ru.aisa.companyAndWorkers.dao.CompanyDao;
 import ru.aisa.companyAndWorkers.entity.Company;
+import ru.aisa.companyAndWorkers.exception.ValueNotUniqueException;
 import ru.aisa.companyAndWorkers.repository.CompanyRepository;
 import ru.aisa.companyAndWorkers.row_mapper.CompanyRowMapper;
 import ru.aisa.companyAndWorkers.row_mapper.WorkerRowMapper;
 
 import javax.sql.DataSource;
+import java.util.NoSuchElementException;
 
 public class CreateOrEditCompanyForm extends Window {
     private CompanyRepository repository;
@@ -40,15 +42,13 @@ public class CreateOrEditCompanyForm extends Window {
         this.buttonLayout = new HorizontalLayout();
 
         this.binder = new Binder<>();
-        this.binder.readBean(company);
-
         initNameLayout();
         initInnLayout();
         initPhoneLayout();
         initAddressLayout();
         initButtonLayout();
         initWindowLayout();
-
+        this.binder.readBean(company);
         this.setModal(true);
     }
 
@@ -112,15 +112,30 @@ public class CreateOrEditCompanyForm extends Window {
     }
 
     private void initButtonLayout(){
-        Button createButton = new Button("Создать", clickEvent -> {
-            try {
-                this.binder.writeBean(company);
-                this.repository.save(company);
-                this.companyGrid.setItems(repository.findAll());
-            } catch (ValidationException e) {
-                Notification.show("Создание объекта не удалось", Notification.Type.ERROR_MESSAGE);
-            } catch (RuntimeException e) {
-                Notification.show("Компания с таким ИНН уже существует", Notification.Type.ERROR_MESSAGE);
+        Button createButton = new Button("Сохранить", clickEvent -> {
+            if (this.company.getId() == null){
+                try {
+                    this.binder.writeBean(company);
+                    this.repository.save(company);
+                    this.companyGrid.setItems(repository.findAll());
+                } catch (ValidationException e) {
+                    Notification.show("Создание объекта не удалось", Notification.Type.ERROR_MESSAGE);
+                } catch (ValueNotUniqueException e) {
+                    Notification.show("Компания с таким ИНН уже существует", Notification.Type.ERROR_MESSAGE);
+                }
+            } else {
+                try {
+                    this.binder.writeBean(company);
+                    this.repository.update(company);
+                    this.companyGrid.deselectAll();
+                    this.companyGrid.setItems(repository.findAll());
+                } catch (ValidationException e) {
+                    Notification.show("Редактирование объекта не удалось", Notification.Type.ERROR_MESSAGE);
+                } catch (NoSuchElementException e) {
+                    Notification.show("Редактируемого элемента не существует", Notification.Type.ERROR_MESSAGE);
+                } catch (ValueNotUniqueException e) {
+                    Notification.show("Компания с таким ИНН уже существует", Notification.Type.ERROR_MESSAGE);
+                }
             }
             close();
         });

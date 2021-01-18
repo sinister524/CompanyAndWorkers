@@ -1,5 +1,6 @@
 package ru.aisa.companyAndWorkers.repository;
 
+import ru.aisa.companyAndWorkers.entity.Company;
 import ru.aisa.companyAndWorkers.entity.Worker;
 
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.Optional;
 public interface WorkerRepository {
 
     List<Worker> findAll();
+
+    List<Worker> findAllCompanyWorkers(Company company);
 
     Worker findById (Long id);
 
